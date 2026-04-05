@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Лоу Скилл — Итоги турнира</title>
+<style>
+
+:root {
+  --bg: #0D0D0F; --surface: #1A1A1E; --surface-el: #242428;
+  --border: rgba(255,255,255,0.06); --border-accent: rgba(229,57,53,0.3);
+  --red: #E53935; --red-dim: rgba(229,57,53,0.15);
+  --text: #E8E8EC; --text-sec: #9E9EA8; --text-dim: #5A5A64;
+  --gold: #D4A84B; --silver: #A0A0A8; --bronze: #8B6D47;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;padding:24px;max-width:960px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;margin-bottom:4px;letter-spacing:0.04em}
+h2{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:12px;padding-left:12px;border-left:3px solid var(--red)}
+.sub{font-size:0.8rem;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase;margin-bottom:24px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:16px}
+.card-accent{background:var(--surface);border:1px solid var(--border-accent);border-radius:6px;padding:16px;margin-bottom:16px}
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.stat{flex:1;min-width:100px;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 8px}
+.stat-val{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stat-lbl{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-top:2px}
+table{width:100%;border-collapse:collapse}
+th{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:0.95rem}
+tr.r1{background:rgba(212,168,75,0.06);border-left:3px solid var(--gold)}
+tr.r2{background:rgba(160,160,168,0.04);border-left:3px solid var(--silver)}
+tr.r3{background:rgba(139,109,71,0.06);border-left:3px solid var(--bronze)}
+.pos{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+  border-radius:4px;font-weight:700;font-size:0.85rem;color:var(--bg)}
+.p1{background:linear-gradient(135deg,#D4A84B,#F0D078)}
+.p2{background:linear-gradient(135deg,#8A8A92,#B8B8C0)}
+.p3{background:linear-gradient(135deg,#8B6D47,#B08960)}
+.p-{background:var(--surface-el);color:var(--text-dim)}
+.mono{font-variant-numeric:tabular-nums;font-family:'Courier New',monospace}
+.pts{font-size:1.1rem;font-weight:700}
+.lap{font-size:0.85rem;color:var(--text-sec);font-family:'Courier New',monospace}
+.ev{display:flex;align-items:flex-start;margin-bottom:10px}
+.ev-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-right:10px;font-size:0.8rem}
+.ev-green{color:#66BB6A} .ev-red{color:var(--red)} .ev-gold{color:var(--gold)} .ev-dim{color:var(--text-dim)}
+.chart-wrap{overflow-x:auto;margin-bottom:8px}
+.history-grid{display:grid;grid-template-columns:1fr 280px;gap:16px;align-items:start;margin-bottom:16px}
+@media(max-width:760px){.history-grid{grid-template-columns:1fr}}
+.chart-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.legend-item{display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:600;padding:2px 6px;
+  border-radius:3px;cursor:pointer}
+.legend-item:hover{background:var(--surface-el)}
+.legend-item.leg-active{background:var(--red-dim)}
+.legend-item.leg-dim{opacity:0.3}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.finalists{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+.finalist{font-weight:600;font-size:1.05rem}
+.players-nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.player-btn{padding:6px 14px;border-radius:4px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text);cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.15s}
+.player-btn:hover{border-color:rgba(255,255,255,0.15)}
+.player-btn.active{border-color:var(--red);background:var(--red-dim);color:var(--text)}
+.player-detail{display:none}
+.player-detail.visible{display:block}
+.moments .m{display:flex;align-items:flex-start;margin-bottom:6px}
+.moments .m-icon{width:18px;flex-shrink:0;margin-right:8px;text-align:center;font-size:0.8rem;margin-top:2px}
+.round-pos{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.round-pos .rp{text-align:center;min-width:48px}
+.round-pos .rp-label{font-size:0.65rem;color:var(--text-dim)}
+.round-pos .rp-delta{font-size:0.75rem}
+.delta-up{color:#66BB6A} .delta-down{color:var(--red)}
+.final-section{margin-top:24px}
+.final-race{margin-bottom:12px}
+.chip{display:inline-block;padding:2px 10px;border-radius:3px;font-size:0.75rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.08em}
+.clickable{cursor:pointer}
+.clickable:hover{background:var(--surface-el)}
+.footer{margin-top:32px;text-align:center;font-size:0.75rem;color:var(--text-dim);padding:16px 0;
+  border-top:1px solid var(--border)}
+@media(max-width:600px){body{padding:12px}h1{font-size:1.2rem}.stat{min-width:80px}}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const DATA = {"tournament":{"id":1,"name":"Лоу Скилл","races_per_player":4,"status":"finished","created_at":"2026-04-04T15:30:23.718091Z"},"standings":[{"player_id":8,"player_name":"Просто Дима","points":11,"best_lap_ms":137557,"races_played":4,"races_left":0,"position":1},{"player_id":7,"player_name":"Ккабачок(Камил)","points":8,"best_lap_ms":139372,"races_played":4,"races_left":0,"position":2},{"player_id":5,"player_name":"Комар(Миша)","points":7,"best_lap_ms":142146,"races_played":4,"races_left":0,"position":3},{"player_id":6,"player_name":"Док. Хатсон (Тимур)","points":7,"best_lap_ms":143594,"races_played":4,"races_left":0,"position":4},{"player_id":12,"player_name":"Роман","points":6,"best_lap_ms":141510,"races_played":4,"races_left":0,"position":5},{"player_id":9,"player_name":"Макс НеФер","points":5,"best_lap_ms":140028,"races_played":4,"races_left":0,"position":6},{"player_id":11,"player_name":"Инесса","points":3,"best_lap_ms":186100,"races_played":4,"races_left":0,"position":7},{"player_id":2,"player_name":"Сергей","points":1,"best_lap_ms":203426,"races_played":4,"races_left":0,"position":8}],"rounds":[{"round":1,"standings":[{"player_id":8,"player_name":"Просто Дима","points":3,"best_lap_ms":139172,"races_played":1,"position":1},{"player_id":12,"player_name":"Роман","points":3,"best_lap_ms":141510,"races_played":1,"position":2},{"player_id":7,"player_name":"Ккабачок(Камил)","points":2,"best_lap_ms":139781,"races_played":1,"position":3},{"player_id":9,"player_name":"Макс НеФер","points":2,"best_lap_ms":152826,"races_played":1,"position":4},{"player_id":6,"player_name":"Док. Хатсон (Тимур)","points":1,"best_lap_ms":149120,"races_played":1,"position":5},{"player_id":11,"player_name":"Инесса","points":1,"best_lap_ms":186100,"races_played":1,"position":6},{"player_id":5,"player_name":"Комар(Миша)","points":0,"best_lap_ms":150821,"races_played":1,"position":7},{"player_id":2,"player_name":"Сергей","points":0,"best_lap_ms":224000,"races_played":1,"position":8}]},{"round":2,"standings":[{"player_id":8,"player_name":"Просто Дима","points":6,"best_lap_ms":137557,"races_played":2,"position":1},{"player_id":9,"player_name":"Макс НеФер","points":4,"best_lap_ms":140028,"races_played":2,"position":2},{"player_id":7,"player_name":"Ккабачок(Камил)","points":3,"best_lap_ms":139372,"races_played":2,"position":3},{"player_id":12,"player_name":"Роман","points":3,"best_lap_ms":141510,"races_played":2,"position":4},{"player_id":5,"player_name":"Комар(Миша)","points":3,"best_lap_ms":142146,"races_played":2,"position":5},{"player_id":6,"player_name":"Док. Хатсон (Тимур)","points":3,"best_lap_ms":143594,"races_played":2,"position":6},{"player_id":11,"player_name":"Инесса","points":2,"best_lap_ms":186100,"races_played":2,"position":7},{"player_id":2,"player_name":"Сергей","points":0,"best_lap_ms":203426,"races_played":2,"position":8}]},{"round":3,"standings":[{"player_id":8,"player_name":"Просто Дима","points":9,"best_lap_ms":137557,"races_played":3,"position":1},{"player_id":6,"player_name":"Док. Хатсон (Тимур)","points":6,"best_lap_ms":143594,"races_played":3,"position":2},{"player_id":7,"player_name":"Ккабачок(Камил)","points":5,"best_lap_ms":139372,"races_played":3,"position":3},{"player_id":9,"player_name":"Макс НеФер","points":5,"best_lap_ms":140028,"races_played":3,"position":4},{"player_id":5,"player_name":"Комар(Миша)","points":5,"best_lap_ms":142146,"races_played":3,"position":5},{"player_id":12,"player_name":"Роман","points":3,"best_lap_ms":141510,"races_played":3,"position":6},{"player_id":11,"player_name":"Инесса","points":2,"best_lap_ms":186100,"races_played":3,"position":7},{"player_id":2,"player_name":"Сергей","points":1,"best_lap_ms":203426,"races_played":3,"position":8}]},{"round":4,"standings":[{"player_id":8,"player_name":"Просто Дима","points":11,"best_lap_ms":137557,"races_played":4,"position":1},{"player_id":7,"player_name":"Ккабачок(Камил)","points":8,"best_lap_ms":139372,"races_played":4,"position":2},{"player_id":5,"player_name":"Комар(Миша)","points":7,"best_lap_ms":142146,"races_played":4,"position":3},{"player_id":6,"player_name":"Док. Хатсон (Тимур)","points":7,"best_lap_ms":143594,"races_played":4,"position":4},{"player_id":12,"player_name":"Роман","points":6,"best_lap_ms":141510,"races_played":4,"position":5},{"player_id":9,"player_name":"Макс НеФер","points":5,"best_lap_ms":140028,"races_played":4,"position":6},{"player_id":11,"player_name":"Инесса","points":3,"best_lap_ms":186100,"races_played":4,"position":7},{"player_id":2,"player_name":"Сергей","points":1,"best_lap_ms":203426,"races_played":4,"position":8}]}],"playerPaths":{"2":{"player_id":2,"player_name":"Сергей","positions":[8,8,8,8],"races":[{"raceId":2,"track":"Suzuka","position":4,"bestLapMs":224000,"points":0},{"raceId":3,"track":"Suzuka","position":4,"bestLapMs":203426,"points":0},{"raceId":6,"track":"Suzuka (дождь)","position":3,"bestLapMs":237196,"points":1},{"raceId":8,"track":"Suzuka","position":4,"bestLapMs":266474,"points":0}],"finalPosition":8,"finalPoints":1,"finalBestLap":203426,"totalRaces":4},"5":{"player_id":5,"player_name":"Комар(Миша)","positions":[7,5,5,3],"races":[{"raceId":1,"track":"Suzuka","position":4,"bestLapMs":150821,"points":0},{"raceId":3,"track":"Suzuka","position":1,"bestLapMs":142146,"points":3},{"raceId":6,"track":"Suzuka (дождь)","position":2,"bestLapMs":191789,"points":2},{"raceId":8,"track":"Suzuka","position":2,"bestLapMs":186553,"points":2}],"finalPosition":3,"finalPoints":7,"finalBestLap":142146,"totalRaces":4},"6":{"player_id":6,"player_name":"Док. Хатсон (Тимур)","positions":[5,6,2,4],"races":[{"raceId":1,"track":"Suzuka","position":3,"bestLapMs":149120,"points":1},{"raceId":3,"track":"Suzuka","position":2,"bestLapMs":143594,"points":2},{"raceId":6,"track":"Suzuka (дождь)","position":1,"bestLapMs":182913,"points":3},{"raceId":7,"track":"Suzuka (дождь)","position":3,"bestLapMs":174096,"points":1}],"finalPosition":4,"finalPoints":7,"finalBestLap":143594,"totalRaces":4},"7":{"player_id":7,"player_name":"Ккабачок(Камил)","positions":[3,3,3,2],"races":[{"raceId":1,"track":"Suzuka","position":2,"bestLapMs":139781,"points":2},{"raceId":4,"track":"Suzuka","position":3,"bestLapMs":139372,"points":1},{"raceId":5,"track":"Suzuka (дождь)","position":2,"bestLapMs":185258,"points":2},{"raceId":7,"track":"Suzuka (дождь)","position":1,"bestLapMs":177964,"points":3}],"finalPosition":2,"finalPoints":8,"finalBestLap":139372,"totalRaces":4},"8":{"player_id":8,"player_name":"Просто Дима","positions":[1,1,1,1],"races":[{"raceId":1,"track":"Suzuka","position":1,"bestLapMs":139172,"points":3},{"raceId":4,"track":"Suzuka","position":1,"bestLapMs":137557,"points":3},{"raceId":5,"track":"Suzuka (дождь)","position":1,"bestLapMs":178807,"points":3},{"raceId":7,"track":"Suzuka (дождь)","position":2,"bestLapMs":173651,"points":2}],"finalPosition":1,"finalPoints":11,"finalBestLap":137557,"totalRaces":4},"9":{"player_id":9,"player_name":"Макс НеФер","positions":[4,2,4,6],"races":[{"raceId":2,"track":"Suzuka","position":2,"bestLapMs":152826,"points":2},{"raceId":4,"track":"Suzuka","position":2,"bestLapMs":140028,"points":2},{"raceId":5,"track":"Suzuka (дождь)","position":3,"bestLapMs":184121,"points":1},{"raceId":7,"track":"Suzuka (дождь)","position":4,"bestLapMs":191232,"points":0}],"finalPosition":6,"finalPoints":5,"finalBestLap":140028,"totalRaces":4},"11":{"player_id":11,"player_name":"Инесса","positions":[6,7,7,7],"races":[{"raceId":2,"track":"Suzuka","position":3,"bestLapMs":186100,"points":1},{"raceId":3,"track":"Suzuka","position":3,"bestLapMs":199476,"points":1},{"raceId":6,"track":"Suzuka (дождь)","position":4,"bestLapMs":291094,"points":0},{"raceId":8,"track":"Suzuka","position":3,"bestLapMs":240760,"points":1}],"finalPosition":7,"finalPoints":3,"finalBestLap":186100,"totalRaces":4},"12":{"player_id":12,"player_name":"Роман","positions":[2,4,6,5],"races":[{"raceId":2,"track":"Suzuka","position":1,"bestLapMs":141510,"points":3},{"raceId":4,"track":"Suzuka","position":4,"bestLapMs":146940,"points":0},{"raceId":5,"track":"Suzuka (дождь)","position":4,"bestLapMs":199402,"points":0},{"raceId":8,"track":"Suzuka","position":1,"bestLapMs":190321,"points":3}],"finalPosition":5,"finalPoints":6,"finalBestLap":141510,"totalRaces":4}},"pivotalMoments":{"2":[{"round":1,"type":"initial","text":"После 1-го раунда занял 8 место: финишировал 4-м"},{"round":4,"type":"eliminated","text":"Завершил основной этап на 8 месте"}],"5":[{"round":1,"type":"initial","text":"После 1-го раунда занял 7 место: финишировал 4-м"},{"round":2,"type":"rise","text":"После 2-го раунда поднялся с 7 на 5 место: выиграл раунд"},{"round":4,"type":"entered_top4","text":"После 4-го раунда вошёл в топ-4: финишировал 2-м и поднялся с 5 на 3 место"},{"round":4,"type":"qualified","text":"Завершил основной этап на 3 месте — вышел в финал"}],"6":[{"round":1,"type":"initial","text":"После 1-го раунда занял 5 место: финишировал 3-м"},{"round":3,"type":"entered_top4","text":"После 3-го раунда вошёл в топ-4: выиграл раунд и поднялся с 6 на 2 место"},{"round":4,"type":"drop","text":"После 4-го раунда опустился с 2 на 4 место: финишировал 3-м"},{"round":4,"type":"qualified","text":"Завершил основной этап на 4 месте — вышел в финал"}],"7":[{"round":1,"type":"initial_top4","text":"После 1-го раунда занял 3 место: финишировал 2-м"},{"round":4,"type":"qualified","text":"Завершил основной этап на 2 месте — вышел в финал"}],"8":[{"round":1,"type":"initial_top4","text":"После 1-го раунда занял 1 место: выиграл раунд"},{"round":4,"type":"qualified","text":"Завершил основной этап на 1 месте — вышел в финал"}],"9":[{"round":1,"type":"initial_top4","text":"После 1-го раунда занял 4 место: финишировал 2-м"},{"round":2,"type":"rise","text":"После 2-го раунда поднялся с 4 на 2 место: финишировал 2-м"},{"round":3,"type":"drop","text":"После 3-го раунда опустился с 2 на 4 место: финишировал 3-м"},{"round":4,"type":"decisive","text":"После 4-го раунда выбыл из борьбы за финал: финишировал 4-м и остался вне топ-4 до конца этапа"},{"round":4,"type":"eliminated","text":"Завершил основной этап на 6 месте"}],"11":[{"round":1,"type":"initial","text":"После 1-го раунда занял 6 место: финишировал 3-м"},{"round":1,"type":"closest","text":"Ближе всего к топ-4 был после 1-го раунда — 6 место"},{"round":4,"type":"eliminated","text":"Завершил основной этап на 7 месте"}],"12":[{"round":1,"type":"initial_top4","text":"После 1-го раунда занял 2 место: выиграл раунд"},{"round":2,"type":"drop","text":"После 2-го раунда опустился с 2 на 4 место: финишировал 4-м"},{"round":3,"type":"decisive","text":"После 3-го раунда выбыл из борьбы за финал: финишировал 4-м и остался вне топ-4 до конца этапа"},{"round":4,"type":"eliminated","text":"Завершил основной этап на 5 месте"}]},"keyEvents":[{"priority":1,"round":3,"type":"decisive","pid":12,"text":"После 3-го раунда Роман выбыл из борьбы за финал: финишировал 4-м и остался вне топ-4 до конца основного этапа"},{"priority":1,"round":4,"type":"decisive","pid":9,"text":"После 4-го раунда Макс НеФер выбыл из борьбы за финал: финишировал 4-м и остался вне топ-4 до конца основного этапа"},{"priority":2,"round":3,"type":"entered_top4","pid":6,"text":"После 3-го раунда Док. Хатсон (Тимур) вошёл в топ-4: выиграл раунд и поднялся с 6 на 2 место"},{"priority":2,"round":4,"type":"entered_top4","pid":5,"text":"После 4-го раунда Комар(Миша) вошёл в топ-4: финишировал 2-м и поднялся с 5 на 3 место"},{"priority":3,"round":3,"type":"best_rise","pid":6,"text":"Док. Хатсон (Тимур) сделал лучший рывок турнира: выиграл раунд в 3-м раунде и поднялся с 6 на 2 место"},{"priority":3,"round":4,"type":"stable","pid":8,"text":"Просто Дима удерживал 1 место весь основной этап"}],"summary":{"totalPlayers":8,"totalMainRaces":8,"totalRounds":4,"finalists":["Просто Дима","Ккабачок(Камил)","Комар(Миша)","Док. Хатсон (Тимур)"],"tournamentName":"Лоу Скилл"},"finalRaces":[{"id":9,"tournament_id":1,"race_type":"final","track":"","status":"pending","created_at":"2026-04-04T21:13:44.701118Z","results":[{"id":595,"race_id":9,"player_id":5,"position":0,"best_lap_ms":0,"player":{"id":5,"name":"Комар(Миша)","created_at":"2026-04-04T15:47:56.56072Z"}},{"id":596,"race_id":9,"player_id":6,"position":0,"best_lap_ms":0,"player":{"id":6,"name":"Док. Хатсон (Тимур)","created_at":"2026-04-04T15:48:11.009117Z"}},{"id":594,"race_id":9,"player_id":7,"position":0,"best_lap_ms":0,"player":{"id":7,"name":"Ккабачок(Камил)","created_at":"2026-04-04T15:48:27.760085Z"}},{"id":593,"race_id":9,"player_id":8,"position":0,"best_lap_ms":0,"player":{"id":8,"name":"Просто Дима","created_at":"2026-04-04T15:49:34.891885Z"}}]},{"id":10,"tournament_id":1,"race_type":"final","track":"itali","status":"finished","created_at":"2026-04-04T21:14:07.764123Z","results":[{"id":661,"race_id":10,"player_id":8,"position":1,"best_lap_ms":134790,"player":{"id":8,"name":"Просто Дима","created_at":"2026-04-04T15:49:34.891885Z"}},{"id":662,"race_id":10,"player_id":5,"position":2,"best_lap_ms":141370,"player":{"id":5,"name":"Комар(Миша)","created_at":"2026-04-04T15:47:56.56072Z"}},{"id":663,"race_id":10,"player_id":6,"position":3,"best_lap_ms":140393,"player":{"id":6,"name":"Док. Хатсон (Тимур)","created_at":"2026-04-04T15:48:11.009117Z"}},{"id":664,"race_id":10,"player_id":7,"position":4,"best_lap_ms":147519,"player":{"id":7,"name":"Ккабачок(Камил)","created_at":"2026-04-04T15:48:27.760085Z"}}]}]};
+
+(function(){
+  const {tournament,standings,rounds,playerPaths,pivotalMoments,keyEvents,summary,finalRaces}=DATA;
+  const app=document.getElementById('app');
+  const pids=standings.map(s=>s.player_id);
+
+  function fmtLap(ms){
+    if(!ms||ms<=0)return '—';
+    const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000),ml=ms%1000;
+    return ml===0?m+':'+String(s).padStart(2,'0'):m+':'+String(s).padStart(2,'0')+'.'+String(ml).padStart(3,'0');
+  }
+  function posClass(p){return p===1?'p1':p===2?'p2':p===3?'p3':'p-'}
+  function rowClass(p){return p===1?'r1':p===2?'r2':p===3?'r3':''}
+  function evColor(t){
+    const m={decisive:'ev-red',entered_top4:'ev-green',left_top4:'ev-red',
+      best_rise:'ev-green',worst_drop:'ev-red',stable:'ev-gold'};
+    return m[t]||'ev-dim';
+  }
+  function evIcon(t){
+    const m={decisive:'✕',entered_top4:'▲',left_top4:'▼',best_rise:'⚡',worst_drop:'↯',stable:'◆'};
+    return m[t]||'●';
+  }
+  function mColor(t){
+    const m={initial_top4:'ev-green',initial:'ev-dim',entered_top4:'ev-green',left_top4:'ev-red',
+      decisive:'ev-red',rise:'ev-green',drop:'ev-red',closest:'ev-gold',qualified:'ev-gold',eliminated:'ev-dim'};
+    return m[t]||'ev-dim';
+  }
+  function mIcon(t){
+    const m={initial_top4:'●',initial:'●',entered_top4:'▲',left_top4:'▼',decisive:'✕',
+      rise:'▲',drop:'▼',closest:'◆',qualified:'★',eliminated:'●'};
+    return m[t]||'●';
+  }
+
+  // Header
+  let h='<h1>'+esc(summary.tournamentName)+'</h1>';
+  h+='<div class="sub">История основного этапа</div>';
+
+  // Summary
+  h+='<div class="stats">';
+  h+='<div class="stat"><div class="stat-val">'+summary.totalPlayers+'</div><div class="stat-lbl">Участников</div></div>';
+  h+='<div class="stat"><div class="stat-val">'+summary.totalMainRaces+'</div><div class="stat-lbl">Заездов</div></div>';
+  h+='<div class="stat"><div class="stat-val">'+summary.totalRounds+'</div><div class="stat-lbl">Раундов</div></div>';
+  h+='</div>';
+
+  // Finalists
+  h+='<div class="card"><h2>Вышли в финал</h2><div class="finalists">';
+  summary.finalists.forEach((n,i)=>{
+    h+='<span class="finalist"><span class="pos '+posClass(i+1)+'" style="width:24px;height:24px;font-size:0.75rem;margin-right:4px">'+(i+1)+'</span> '+esc(n)+'</span>';
+  });
+  h+='</div></div>';
+
+  // Chart (full width)
+  if(rounds.length>=2){
+    h+='<div class="card"><h2>Динамика позиций</h2><div class="chart-wrap" id="chart"></div>';
+    h+='<div class="chart-legend" id="legend"></div></div>';
+  }
+
+  // Key events
+  if(keyEvents.length){
+    h+='<div class="card-accent"><h2>Главные моменты турнира</h2>';
+    keyEvents.forEach(ev=>{
+      h+='<div class="ev"><span class="ev-icon '+evColor(ev.type)+'">'+evIcon(ev.type)+'</span><span>'+esc(ev.text)+'</span></div>';
+    });
+    h+='</div>';
+  }
+
+  // Standings table
+  h+='<div class="card"><h2>Итоговая таблица основного этапа</h2><table><thead><tr>';
+  h+='<th style="width:50px">Поз</th><th>Участник</th><th>Очки</th><th>Лучший круг</th><th>Заездов</th></tr></thead><tbody>';
+  standings.forEach(s=>{
+    h+='<tr class="'+rowClass(s.position)+' clickable" onclick="selectPlayer('+s.player_id+')">';
+    h+='<td><span class="pos '+posClass(s.position)+'">'+s.position+'</span></td>';
+    h+='<td style="font-weight:600">'+esc(s.player_name)+'</td>';
+    h+='<td><span class="pts">'+s.points+'</span></td>';
+    h+='<td><span class="lap">'+fmtLap(s.best_lap_ms)+'</span></td>';
+    h+='<td class="mono" style="color:var(--text-sec)">'+s.races_played+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+
+  // Player nav
+  h+='<div class="card"><h2>Путь участника</h2>';
+  h+='<div class="players-nav" id="pnav">';
+  pids.forEach(pid=>{
+    const p=playerPaths[pid];
+    h+='<button class="player-btn" data-pid="'+pid+'" onclick="selectPlayer('+pid+')">'+esc(p.player_name)+'</button>';
+  });
+  h+='</div>';
+
+  // Player details
+  pids.forEach(pid=>{
+    const p=playerPaths[pid];
+    const moments=pivotalMoments[pid]||[];
+    h+='<div class="player-detail" id="pd-'+pid+'">';
+    // Stats
+    h+='<div class="stats">';
+    h+='<div class="stat"><div class="stat-val">'+p.finalPosition+'</div><div class="stat-lbl">Место</div></div>';
+    h+='<div class="stat"><div class="stat-val">'+p.finalPoints+'</div><div class="stat-lbl">Очки</div></div>';
+    h+='<div class="stat"><div class="stat-val">'+fmtLap(p.finalBestLap)+'</div><div class="stat-lbl">Лучший круг</div></div>';
+    h+='<div class="stat"><div class="stat-val">'+p.totalRaces+'</div><div class="stat-lbl">Заездов</div></div>';
+    h+='</div>';
+    // Moments
+    if(moments.length){
+      h+='<div class="moments" style="margin-bottom:14px">';
+      h+='<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:8px">Переломные моменты</div>';
+      moments.forEach(m=>{
+        h+='<div class="m"><span class="m-icon '+mColor(m.type)+'">'+mIcon(m.type)+'</span><span>'+esc(m.text)+'</span></div>';
+      });
+      h+='</div>';
+    }
+    // Round positions
+    if(p.positions.length){
+      h+='<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:8px">Позиция по раундам</div>';
+      h+='<div class="round-pos">';
+      p.positions.forEach((pos,i)=>{
+        h+='<div class="rp"><div class="rp-label">Р'+(i+1)+'</div>';
+        h+='<div><span class="pos '+posClass(pos)+'" style="margin:4px auto;width:30px;height:30px;line-height:30px;font-size:0.85rem">'+pos+'</span></div>';
+        if(i>0){
+          const prev=p.positions[i-1];
+          if(prev>pos)h+='<div class="rp-delta delta-up">▲'+(prev-pos)+'</div>';
+          else if(prev<pos)h+='<div class="rp-delta delta-down">▼'+(pos-prev)+'</div>';
+          else h+='<div class="rp-delta" style="color:var(--text-dim)">—</div>';
+        }
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+    // Race history
+    if(p.races.length){
+      h+='<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin:12px 0 8px">История заездов</div>';
+      h+='<table><thead><tr><th>#</th><th>Трасса</th><th>Место</th><th>Очки</th><th>Лучший круг</th></tr></thead><tbody>';
+      p.races.forEach((r,i)=>{
+        h+='<tr><td class="mono" style="color:var(--text-dim)">'+(i+1)+'</td>';
+        h+='<td>'+(r.track||'—')+'</td>';
+        h+='<td><span class="pos '+posClass(r.position)+'" style="width:24px;height:24px;font-size:0.8rem">'+r.position+'</span></td>';
+        h+='<td><span class="pts" style="font-size:1rem">'+r.points+'</span></td>';
+        h+='<td><span class="lap">'+fmtLap(r.bestLapMs)+'</span></td></tr>';
+      });
+      h+='</tbody></table>';
+    }
+    h+='</div>';
+  });
+  h+='</div>';
+
+  // Final races
+  if(finalRaces&&finalRaces.length){
+    h+='<div class="final-section"><div class="card"><h2>Финальные заезды</h2>';
+    finalRaces.forEach(r=>{
+      if(r.status!=='finished'||!r.results||!r.results.length)return;
+      h+='<div class="final-race"><div style="font-weight:600;margin-bottom:6px">'+(r.track||'Финальный заезд')+'</div>';
+      h+='<table><thead><tr><th style="width:50px">Место</th><th>Участник</th><th>Лучший круг</th></tr></thead><tbody>';
+      var sorted=[...r.results].sort((a,b)=>(a.position||99)-(b.position||99));
+      sorted.forEach(rr=>{
+        h+='<tr class="'+rowClass(rr.position)+'">';
+        h+='<td><span class="pos '+posClass(rr.position)+'">'+rr.position+'</span></td>';
+        h+='<td style="font-weight:600">'+(rr.player?esc(rr.player.name):'—')+'</td>';
+        h+='<td><span class="lap">'+fmtLap(rr.best_lap_ms)+'</span></td></tr>';
+      });
+      h+='</tbody></table></div>';
+    });
+    h+='</div></div>';
+  }
+
+  // Footer
+  h+='<div class="footer">GT Tournament Report</div>';
+
+  app.innerHTML=h;
+
+  // Draw chart
+  if(rounds.length>=2){
+    const nPlayers=pids.length;
+    const nRounds=rounds.length;
+    const colors=['#E53935','#42A5F5','#66BB6A','#D4A84B','#AB47BC','#FF7043','#26C6DA','#EC407A','#7E57C2','#9CCC65','#8D6E63','#78909C'];
+    const pad={t:20,r:16,b:28,l:36};
+    const w=Math.max(400,pad.l+pad.r+nRounds*70);
+    const ht=pad.t+pad.b+nPlayers*36;
+    function xS(r){const inner=w-pad.l-pad.r;return nRounds<=1?pad.l:pad.l+((r-1)/(nRounds-1))*inner}
+    function yS(p){const inner=ht-pad.t-pad.b;return pad.t+((p-1)/((nPlayers-1)||1))*inner}
+
+    let svg='<svg viewBox="0 0 '+w+' '+ht+'" width="'+w+'" height="'+ht+'" style="display:block;max-width:100%">';
+    svg+='<rect x="'+pad.l+'" y="'+pad.t+'" width="'+(w-pad.l-pad.r)+'" height="'+(yS(4.5)-pad.t)+'" fill="rgba(229,57,53,0.06)" rx="4"/>';
+    svg+='<line x1="'+pad.l+'" x2="'+(w-pad.r)+'" y1="'+yS(4.5)+'" y2="'+yS(4.5)+'" stroke="rgba(229,57,53,0.25)" stroke-dasharray="6 4"/>';
+    svg+='<text x="'+(w-pad.r-4)+'" y="'+(yS(4.5)-4)+'" fill="rgba(229,57,53,0.5)" font-size="11" text-anchor="end">Топ-4</text>';
+    for(let p=1;p<=nPlayers;p++){
+      svg+='<text x="'+(pad.l-8)+'" y="'+(yS(p)+4)+'" fill="var(--text-dim)" font-size="12" text-anchor="end" style="font-variant-numeric:tabular-nums">'+p+'</text>';
+    }
+    for(let r=1;r<=nRounds;r++){
+      svg+='<text x="'+xS(r)+'" y="'+(ht-4)+'" fill="var(--text-dim)" font-size="11" text-anchor="middle">'+r+'</text>';
+    }
+    pids.forEach((pid,idx)=>{
+      const path=playerPaths[pid];
+      if(!path)return;
+      const pts=path.positions.map((p,i)=>xS(i+1)+','+yS(p)).join(' ');
+      const col=colors[idx%colors.length];
+      svg+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" data-pid="'+pid+'"/>';
+    });
+    svg+='</svg>';
+    document.getElementById('chart').innerHTML=svg;
+
+    // Legend
+    var legH='';
+    pids.forEach((pid,idx)=>{
+      const col=colors[idx%colors.length];
+      const name=playerPaths[pid]?playerPaths[pid].player_name:'';
+      legH+='<span class="legend-item" data-lpid="'+pid+'" onclick="selectPlayer('+pid+')">';
+      legH+='<span class="legend-dot" style="background:'+col+'"></span>'+esc(name)+'</span>';
+    });
+    document.getElementById('legend').innerHTML=legH;
+  }
+
+  // Player selection
+  var currentPid=null;
+  window.selectPlayer=function(pid){
+    if(currentPid===pid){
+      document.querySelectorAll('.player-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.player-detail').forEach(d=>d.classList.remove('visible'));
+      document.querySelectorAll('.legend-item').forEach(l=>{l.classList.remove('leg-active','leg-dim')});
+      document.querySelectorAll('polyline[data-pid]').forEach(l=>{l.setAttribute('stroke-width','1.5');l.setAttribute('opacity','1')});
+      currentPid=null;
+      return;
+    }
+    currentPid=pid;
+    document.querySelectorAll('.player-btn').forEach(b=>{
+      b.classList.toggle('active',parseInt(b.dataset.pid)===pid);
+    });
+    document.querySelectorAll('.player-detail').forEach(d=>{
+      d.classList.toggle('visible',d.id==='pd-'+pid);
+    });
+    document.querySelectorAll('.legend-item').forEach(l=>{
+      var lp=parseInt(l.dataset.lpid);
+      l.classList.toggle('leg-active',lp===pid);
+      l.classList.toggle('leg-dim',lp!==pid);
+    });
+    document.querySelectorAll('polyline[data-pid]').forEach(l=>{
+      var lp=parseInt(l.dataset.pid);
+      l.setAttribute('stroke-width',lp===pid?'3':'1.5');
+      l.setAttribute('opacity',lp===pid?'1':'0.2');
+    });
+  };
+
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+})();
+
+</script>
+</body>
+</html>
